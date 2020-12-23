@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from multiple_choices.models import MultipleChoice, Solution
+from django.db.transaction import atomic
 
 
 class SolutionSerializer(serializers.ModelSerializer):
@@ -15,3 +16,10 @@ class MultipleChoiceSerializer(serializers.ModelSerializer):
         model = MultipleChoice
         fields = ("id", "question", "workload", "deadline", "solution_set",)
 
+    @atomic
+    def create(self, validated_data):
+        solution_set = validated_data.pop("solution_set")
+        multiple_choice = MultipleChoice.objects.create(**validated_data)
+        for solution in solution_set:
+            Solution.objects.create(multiple_choice=multiple_choice, **solution)
+        return multiple_choice
