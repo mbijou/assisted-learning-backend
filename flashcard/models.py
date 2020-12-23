@@ -21,5 +21,6 @@ class MultipleChoice(Flashcard):
 
 
 class Solution(models.Model):
+    answer = models.TextField()
     solution = models.BooleanField()
-    multiple_choice = models.ForeignKey()
+    multiple_choice = models.ForeignKey("flashcard.MultipleChoice", null=False, on_delete=models.CASCADE)
