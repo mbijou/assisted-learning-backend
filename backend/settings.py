@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'flashcard',
+    'single_choices',
+    'multiple_choices',
     'rest_framework',
 ]
 

@@ -10,17 +10,3 @@ class Flashcard(models.Model):
     question = models.TextField()
     workload = models.IntegerField()
     deadline = models.DateField()
-
-
-class SingleChoice(Flashcard):
-    solution = models.BooleanField()
-
-
-class MultipleChoice(Flashcard):
-    pass
-
-
-class Solution(models.Model):
-    answer = models.TextField()
-    solution = models.BooleanField()
-    multiple_choice = models.ForeignKey("flashcard.MultipleChoice", null=False, on_delete=models.CASCADE)
