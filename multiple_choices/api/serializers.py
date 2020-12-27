@@ -4,14 +4,49 @@ from django.db.transaction import atomic
 
 
 class SolutionSerializer(serializers.ModelSerializer):
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        if kwargs.get("context").get("id_read_only") is False:
+            self.fields.get("id").read_only = False
+        elif kwargs.get("context").get("id_read_only") is True:
+            self.fields.get("id").read_only = True
+
+
     class Meta:
         model = Solution
-        fields = ('id', "answer", "solution", )
-        extra_kwargs = {'id': {'read_only': False}}
+        fields = ('id', "answer", "solution",)
+        # Bei CREATE -> 'read_only' : True, Bei Update -> 'read_only' : False
+        # extra_kwargs = {'id': {'read_only': False}}
 
 
 class MultipleChoiceSerializer(serializers.ModelSerializer):
-    solution_set = SolutionSerializer(many=True)
+    def __init__(self, *args, **kwargs):
+
+        # self.solution_set = SolutionSerializer(
+        #             many=True, context={"id_read_only": False}
+        #         )
+
+
+        super().__init__(*args, **kwargs)
+
+        self.solution_set.context["id_read_only"] = False
+
+        # instance = self.instance[0]
+
+        print("KOMMENTAR", self.instance)
+
+        # if self.instance and self.instance.pk:
+        #     self.solution_set = SolutionSerializer(
+        #         many=True, context={"id_read_only": True}
+        #     )
+
+
+
+
+
+    solution_set = SolutionSerializer(many=True, context={"id_read_only": True})
 
     class Meta:
         model = MultipleChoice
