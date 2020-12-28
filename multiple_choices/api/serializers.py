@@ -5,14 +5,11 @@ from django.db.transaction import atomic
 
 class SolutionSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
-
         super().__init__(*args, **kwargs)
-
         if kwargs.get("context").get("id_read_only") is False:
             self.fields.get("id").read_only = False
         elif kwargs.get("context").get("id_read_only") is True:
             self.fields.get("id").read_only = True
-
 
     class Meta:
         model = Solution
@@ -22,28 +19,6 @@ class SolutionSerializer(serializers.ModelSerializer):
 
 
 class MultipleChoiceSerializer(serializers.ModelSerializer):
-    def __init__(self, *args, **kwargs):
-
-        # self.solution_set = SolutionSerializer(
-        #             many=True, context={"id_read_only": False}
-        #         )
-
-
-        super().__init__(*args, **kwargs)
-
-        self.solution_set.context["id_read_only"] = False
-
-        # instance = self.instance[0]
-
-        print("KOMMENTAR", self.instance)
-
-        # if self.instance and self.instance.pk:
-        #     self.solution_set = SolutionSerializer(
-        #         many=True, context={"id_read_only": True}
-        #     )
-
-
-
     solution_set = SolutionSerializer(many=True, context={"id_read_only": True})
 
     class Meta:
@@ -54,9 +29,19 @@ class MultipleChoiceSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         solution_set = validated_data.pop("solution_set")
         multiple_choice = MultipleChoice.objects.create(**validated_data)
+
         for solution in solution_set:
             Solution.objects.create(multiple_choice=multiple_choice, **solution)
+
         return multiple_choice
+
+
+class MultipleChoiceUpdateSerializer(serializers.ModelSerializer):
+    solution_set = SolutionSerializer(many=True, context={"id_read_only": False})
+
+    class Meta:
+        model = MultipleChoice
+        fields = ("id", "question", "workload", "deadline", "solution_set",)
 
     @atomic
     def update(self, instance, validated_data):
