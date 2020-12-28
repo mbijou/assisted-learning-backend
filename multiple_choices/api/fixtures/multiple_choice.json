@@ -1,0 +1,11 @@
+[
+{
+    "model": "multiple_choices.multiplechoice",
+    "pk": 2,
+    "fields": {
+        "question": "Was ist die Hauptstadt von Deutschland?",
+        "workload": 42,
+        "deadline": "2020-03-12"
+    }
+}
+]
