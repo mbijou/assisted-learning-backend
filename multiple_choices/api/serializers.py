@@ -44,8 +44,6 @@ class MultipleChoiceSerializer(serializers.ModelSerializer):
 
 
 
-
-
     solution_set = SolutionSerializer(many=True, context={"id_read_only": True})
 
     class Meta:
