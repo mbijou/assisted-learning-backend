@@ -1,7 +1,12 @@
 from django.db import models
-from flashcard.models import Flashcard
-# Create your models here.
+from django.db.models.signals import post_save
+from flashcard.abstract_models import AbstractFlashcard
+from flashcard.models import create_flashcard
 
 
-class SingleChoice(Flashcard):
+class SingleChoice(AbstractFlashcard):
     solution = models.BooleanField()
+
+
+post_save.connect(create_flashcard, sender=SingleChoice)
+
