@@ -14,6 +14,7 @@ class UserTests(APITestCase):
         self.assertEqual(response.status_code, 200)
         token = response.json()['token']
         print(token)
+        print(response.json()["user"])
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token)
         response = self.client.get("/api/v1/single-choices/")
         self.assertEqual(response.status_code, 200)

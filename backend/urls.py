@@ -19,10 +19,12 @@ from single_choices.api import urls as single_choices_urls
 from multiple_choices.api import urls as multiple_choices_urls
 from rest_framework.authtoken import views
 
+from users.api.serializers import CustomAuthToken
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/api-auth/', include('rest_framework.urls')),
-    path('api/v1/api-token-auth/', views.obtain_auth_token),
+    path('api/v1/api-token-auth/', CustomAuthToken.as_view()),
     path('api/v1/', include(single_choices_urls)),
     path('api/v1/', include(multiple_choices_urls)),
 ]
