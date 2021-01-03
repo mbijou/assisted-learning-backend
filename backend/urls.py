@@ -18,7 +18,6 @@ from django.urls import include, path
 from single_choices.api import urls as single_choices_urls
 from multiple_choices.api import urls as multiple_choices_urls
 from rest_framework.authtoken import views
-
 from users.api.serializers import CustomAuthToken
 
 urlpatterns = [
@@ -27,4 +26,5 @@ urlpatterns = [
     path('api/v1/api-token-auth/', CustomAuthToken.as_view()),
     path('api/v1/', include(single_choices_urls)),
     path('api/v1/', include(multiple_choices_urls)),
+    path('api/v1/', include("flashcard.api.urls"))
 ]
