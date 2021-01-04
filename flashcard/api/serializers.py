@@ -5,7 +5,7 @@ from flashcard.models import Flashcard
 class FlashcardSerializer(ModelSerializer):
     class Meta:
         model = Flashcard
-        fields = ("id", "question", "deadline", "workload", "type", "object_id", )
+        fields = ("id", "question", "deadline", "workload", "type", "object_id", "rank", )
 
     type = SerializerMethodField()
     object_id = SerializerMethodField()

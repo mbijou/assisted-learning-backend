@@ -1,9 +1,17 @@
 from rest_framework.routers import SimpleRouter
-
-from multiple_choices.api.viewsets import MultipleChoiceViewSet
+from django.urls import path
+from multiple_choices.api.viewsets import MultipleChoiceViewSet, MultipleChoiceAnswerViewSet
 
 router = SimpleRouter()
-
 router.register("multiple-choices", MultipleChoiceViewSet)
 
-urlpatterns = router.urls
+answer_urls = [
+    path("users/<int:user_id>/multiple-choices/<int:multiple_choice_id>/answers/",
+         MultipleChoiceAnswerViewSet.as_view({"get": "list", "post": "create"})),
+
+    path("users/<int:user_id>/multiple-choices/<int:multiple_choice_id>/answers/<int:pk>/",
+         MultipleChoiceAnswerViewSet.as_view({"get": "retrieve"})),
+]
+
+urlpatterns = router.urls + answer_urls
+

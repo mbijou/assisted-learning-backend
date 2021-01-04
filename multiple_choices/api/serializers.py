@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from multiple_choices.models import MultipleChoice, Solution
+from multiple_choices.models import MultipleChoice, Solution, MultipleChoiceSolutionAnswer
 from django.db.transaction import atomic
 
 
@@ -57,3 +57,28 @@ class MultipleChoiceUpdateSerializer(serializers.ModelSerializer):
             if solution_instance.multiple_choice == instance:
                 Solution(pk=solution_id, multiple_choice=instance, **solution).save()
         return instance
+
+
+class MultipleChoiceSolutionAnswerSerializer(serializers.Serializer):
+    solution = serializers.IntegerField()
+    answer = serializers.BooleanField()
+
+
+class MultipleChoiceAnswerSerializer(serializers.ModelSerializer):
+    multiplechoicesolutionanswer_set = MultipleChoiceSolutionAnswerSerializer(many=True, write_only=True)
+
+    class Meta:
+        model = MultipleChoice
+        fields = ("id", "multiplechoicesolutionanswer_set")
+
+    @atomic
+    def create(self, validated_data):
+        answer_set = validated_data.pop("multiplechoicesolutionanswer_set")
+        user_id = self.context.get("user_id")
+        multiple_choice_id = self.context.get("multiple_choice_id")
+        for answer in answer_set:
+            MultipleChoiceSolutionAnswer.objects.create(solution_id=answer.get("solution_id"), user_id=user_id,
+                                                        answer=answer.get("answer"))
+        print("asdsa", answer_set)
+        self.instance = MultipleChoice.objects.get(pk=multiple_choice_id)
+        return self.instance

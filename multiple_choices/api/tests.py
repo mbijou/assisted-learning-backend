@@ -1,4 +1,3 @@
-from django.test import TestCase
 from rest_framework.test import APITestCase
 from multiple_choices.models import MultipleChoice, Solution
 from django.contrib.auth import get_user_model
@@ -47,40 +46,48 @@ class MultipleChoiceUpdateTests(APITestCase):
         print(MultipleChoice.objects.all(), Solution.objects.all())
         data = {"question": "Was ist die Hauptstadt von Deutschland?", "workload": 60, "deadline": "2020-04-03",
                 "solution_set": [
-                    {"id": 4, "answer": "Bonn", "solution": False},
-                    {"id": 5, "answer": "Frankfurt", "solution": False},
-                    {"id": 6, "answer": "Berlin", "solution": True}
+                    {"id": 1, "answer": "Bonn", "solution": False},
+                    {"id": 2, "answer": "Frankfurt", "solution": False},
+                    {"id": 3, "answer": "Berlin", "solution": True}
                 ]
                 }
         response = self.client.put(f"/api/v1/multiple-choices/{multiple_choice.id}/", data, format="json")
         self.assertEqual(response.status_code, 200, "response.status_code should be 200")
 
-        updated_solution = Solution.objects.get(id=6)
+        updated_solution = Solution.objects.get(id=3)
         self.assertEqual(updated_solution.solution, True, "updated_solution.solution should be True")
 
-# Create your tests here.
 
-# {
-# 	"question": "Wie siehst du das eigentlich?",
-# 	"workload": 100,
-# 	"deadline": "2020-12-03",
-# 	"solution_set": [
-# 		{"answer": "abc", "solution": false},
-# 		{"answer": "def", "solution": false},
-# 		{"answer": "ghi", "solution": false}
-# 	]
-#
-# }
+class MultipleChoiceAnswerTests(APITestCase):
+    fixtures = ["multiple_choices/api/fixtures/multiple_choice.json",  "multiple_choices/api/fixtures/users.json"]
 
+    def setUp(self):
+        self.user = User.objects.get(username="admin")
+        self.client.force_authenticate(user=self.user)
+        self.multiple_choice = MultipleChoice.objects.get(pk=2)
 
-# {
-# 	"question": "Wie siehst du das eigentlich 2.0?",
-# 	"workload": 100,
-# 	"deadline": "2020-12-03",
-# 	"solution_set": [
-# 		{"id": 4, "answer": "fff", "solution": false},
-# 		{"id": 5, "answer": "ggg", "solution": false},
-# 		{"id": 6, "answer": "hhh", "solution": true}
-# 	]
-#
-# }
+    def test_multiple_choice_can_be_answered(self):
+        response = self.client.post(f"/api/v1/users/{self.user.id}/multiple-choices/{self.multiple_choice.id}/answers/",
+                                    {
+                                        "multiplechoicesolutionanswer_set": [
+                                            {
+                                                "solution": 1,
+                                                "answer": False
+                                            },
+                                            {
+                                                "solution": 2,
+                                                "answer": False
+                                            },
+                                            {
+                                                "solution": 3,
+                                                "answer": False
+                                            },
+                                            {
+                                                "solution": 4,
+                                                "answer": True
+                                            }
+                                        ]
+                                    }, format="json")
+        print(response.content)
+        self.assertEqual(response.status_code, 201)
+

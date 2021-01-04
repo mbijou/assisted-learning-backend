@@ -1,0 +1,22 @@
+[
+{
+    "model": "single_choices.singlechoice",
+    "pk": 1,
+    "fields": {
+        "question": "Ist die Antwort korrekt?",
+        "workload": 5,
+        "deadline": "2021-02-04",
+        "solution": true
+    }
+},
+{
+    "model": "single_choices.singlechoice",
+    "pk": 2,
+    "fields": {
+        "question": "Bist du sch�n?",
+        "workload": 22,
+        "deadline": "2021-01-11",
+        "solution": true
+    }
+}
+]

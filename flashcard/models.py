@@ -8,6 +8,7 @@ class Flashcard(AbstractFlashcard):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
+    rank = models.IntegerField(null=True, blank=False, default=1)
 
     def __str__(self):
         return f"{self.question}"
