@@ -34,5 +34,41 @@
         "solution": true,
         "multiple_choice": 2
     }
+},
+{
+    "model": "multiple_choices.solution",
+    "pk": 5,
+    "fields": {
+        "answer": "Bonn",
+        "solution": false,
+        "multiple_choice": 3
+    }
+},
+{
+    "model": "multiple_choices.solution",
+    "pk": 6,
+    "fields": {
+        "answer": "Frankfurt",
+        "solution": false,
+        "multiple_choice": 3
+    }
+},
+{
+    "model": "multiple_choices.solution",
+    "pk": 7,
+    "fields": {
+        "answer": "Berlin",
+        "solution": false,
+        "multiple_choice": 3
+    }
+},
+{
+    "model": "multiple_choices.solution",
+    "pk": 8,
+    "fields": {
+        "answer": "Berlin",
+        "solution": true,
+        "multiple_choice": 3
+    }
 }
 ]

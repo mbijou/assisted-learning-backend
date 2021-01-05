@@ -16,5 +16,23 @@
         "groups": [],
         "user_permissions": []
     }
+},
+{
+    "model": "auth.user",
+    "pk": 2,
+    "fields": {
+        "password": "pbkdf2_sha256$216000$V4LyeMMlYpPR$hGKcQuWGyISdnNqmtsoUZTW01KTOBIn4OqQDXiSZxtw=",
+        "last_login": null,
+        "is_superuser": true,
+        "username": "admin2",
+        "first_name": "Admin2",
+        "last_name": "Admin2",
+        "email": "admin2@admin2.admin2",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2021-01-01T19:51:20.274Z",
+        "groups": [],
+        "user_permissions": []
+    }
 }
 ]

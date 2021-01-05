@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from multiple_choices.models import MultipleChoice, Solution, MultipleChoiceSolutionAnswer
 from django.db.transaction import atomic
+from rest_framework.exceptions import ValidationError
 
 
 class SolutionSerializer(serializers.ModelSerializer):
@@ -41,7 +42,15 @@ class MultipleChoiceUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MultipleChoice
-        fields = ("id", "question", "workload", "deadline", "solution_set",)
+        fields = ("id", "question", "workload", "deadline", "solution_set", )
+
+    def validate(self, attrs):
+        for solution_dict in attrs.get("solution_set"):
+            solution = Solution.objects.get(pk=solution_dict.get("id"))
+            print("ID", solution.multiple_choice.id, self.context.get("pk"))
+            if solution.multiple_choice.id != int(self.context.get("pk")):
+                raise ValidationError("Solution must be of the same Multiple Choice")
+        return super().validate(attrs)
 
     @atomic
     def update(self, instance, validated_data):
@@ -59,26 +68,29 @@ class MultipleChoiceUpdateSerializer(serializers.ModelSerializer):
         return instance
 
 
-class MultipleChoiceSolutionAnswerSerializer(serializers.Serializer):
-    solution = serializers.IntegerField()
-    answer = serializers.BooleanField()
-
-
-class MultipleChoiceAnswerSerializer(serializers.ModelSerializer):
-    multiplechoicesolutionanswer_set = MultipleChoiceSolutionAnswerSerializer(many=True, write_only=True)
-
+class MultipleChoiceSolutionAnswerSerializer(serializers.ModelSerializer):
     class Meta:
-        model = MultipleChoice
-        fields = ("id", "multiplechoicesolutionanswer_set")
+        model = MultipleChoiceSolutionAnswer
+        fields = ("id", "solution", "answer", "user", )
+
+    def validate(self, attrs):
+        solution = attrs.get("solution")
+        print("MESSAGE ", solution.multiple_choice, self.context.get("multiple_choice_id"))
+        if solution.multiple_choice.id != self.context.get("multiple_choice_id"):
+            raise ValidationError("Answers solution must be of the same Multiple Choice")
+        print(attrs)
+        return super().validate(attrs)
 
     @atomic
     def create(self, validated_data):
-        answer_set = validated_data.pop("multiplechoicesolutionanswer_set")
         user_id = self.context.get("user_id")
-        multiple_choice_id = self.context.get("multiple_choice_id")
-        for answer in answer_set:
-            MultipleChoiceSolutionAnswer.objects.create(solution_id=answer.get("solution_id"), user_id=user_id,
-                                                        answer=answer.get("answer"))
-        print("asdsa", answer_set)
-        self.instance = MultipleChoice.objects.get(pk=multiple_choice_id)
+        self.instance = MultipleChoiceSolutionAnswer.objects.create(**validated_data, user_id=user_id)
         return self.instance
+
+
+class MultipleChoiceAnswerSetSerializer(serializers.ModelSerializer):
+    multiplechoicesolutionanswer_set = MultipleChoiceSolutionAnswerSerializer(many=True, write_only=True)
+
+    class Meta:
+        model = MultipleChoiceSolutionAnswer
+        fields = ("id", "solution", "answer", "user", "multiplechoicesolutionanswer_set", )

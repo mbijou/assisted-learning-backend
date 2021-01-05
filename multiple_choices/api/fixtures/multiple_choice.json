@@ -7,5 +7,14 @@
         "workload": 42,
         "deadline": "2020-03-12"
     }
+},
+{
+    "model": "multiple_choices.multiplechoice",
+    "pk": 3,
+    "fields": {
+        "question": "Wo liegt Amerika?",
+        "workload": 42,
+        "deadline": "2020-03-12"
+    }
 }
 ]
