@@ -15,6 +15,5 @@ class SingleChoiceAnswerViewSet(GenericViewSet, CreateModelMixin, RetrieveModelM
     serializer_class = SingleChoiceAnswerSerializer
 
     def get_serializer_context(self):
-        context = {"user_id": self.kwargs.get("user_id"), "single_choice_id": self.kwargs.get("single_choice_id")}
-        print(context)
+        context = {"single_choice_id": self.kwargs.get("single_choice_id")}
         return context

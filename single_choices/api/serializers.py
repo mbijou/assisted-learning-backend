@@ -1,4 +1,6 @@
 from rest_framework.serializers import ModelSerializer
+
+from flashcard.models import Flashcard
 from single_choices.models import SingleChoice, SingleChoiceAnswer
 from django.db.transaction import atomic
 
@@ -6,7 +8,7 @@ from django.db.transaction import atomic
 class SingleChoiceSerializer(ModelSerializer):
     class Meta:
         model = SingleChoice
-        fields = ('id', 'question', 'workload', 'deadline', 'solution', )
+        fields = ('id', 'question', 'workload', 'deadline', 'solution',  "user", )
 
 
 class SingleChoiceAnswerSerializer(ModelSerializer):
@@ -16,8 +18,9 @@ class SingleChoiceAnswerSerializer(ModelSerializer):
 
     @atomic
     def create(self, validated_data):
-        user_id = self.context.get("user_id")
         single_choice_id = self.context.get("single_choice_id")
-        instance = SingleChoiceAnswer.objects.create(single_choice_id=single_choice_id, user_id=user_id,
-                                                     **validated_data)
+        instance = SingleChoiceAnswer.objects.create(single_choice_id=single_choice_id, **validated_data)
+
+        Flashcard.update_ranks(single_choice_id, "singlechoice")
+
         return instance

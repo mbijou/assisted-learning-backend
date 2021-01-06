@@ -7,10 +7,10 @@ router.register('single-choices', SingleChoiceViewSet)
 
 
 answer_urls = [
-    path("users/<int:user_id>/single-choices/<int:single_choice_id>/answers/",
+    path("single-choices/<int:single_choice_id>/answers/",
          SingleChoiceAnswerViewSet.as_view({"get": "list", "post": "create"})),
 
-    path("users/<int:user_id>/single-choices/<int:single_choice_id>/answers/<int:pk>/",
+    path("single-choices/<int:single_choice_id>/answers/<int:pk>/",
          SingleChoiceAnswerViewSet.as_view({"get": "retrieve"})),
 ]
 

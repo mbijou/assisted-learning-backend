@@ -1,6 +1,9 @@
+from django.db.models import Max, F
+from django.db.transaction import atomic
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.mixins import RetrieveModelMixin, CreateModelMixin, ListModelMixin
+from flashcard.models import Flashcard
 from multiple_choices.api.serializers import MultipleChoiceSerializer, MultipleChoiceUpdateSerializer, \
     MultipleChoiceAnswerSetSerializer, MultipleChoiceSolutionAnswerSerializer
 from multiple_choices.models import MultipleChoice, MultipleChoiceSolutionAnswer
@@ -26,23 +29,25 @@ class MultipleChoiceAnswerViewSet(GenericViewSet, CreateModelMixin, RetrieveMode
     queryset = MultipleChoiceSolutionAnswer.objects.all()
     serializer_class = MultipleChoiceAnswerSetSerializer
 
-    # def get_serializer_context(self):
-    #     return {"user_id": self.kwargs.get("user_id"), "multiple_choice_id": self.kwargs.get("multiple_choice_id")}
-
+    @atomic
     def create(self, request, *args, **kwargs):
         answer_set = request.data.get("multiplechoicesolutionanswer_set")
+        multiple_choice_id = self.kwargs.get("multiple_choice_id")
         response_data = []
         for answer in answer_set:
-            context = {"user_id": self.kwargs.get("user_id"),
-                       "multiple_choice_id": self.kwargs.get("multiple_choice_id")}
+            context = {"multiple_choice_id": multiple_choice_id}
             serializer = MultipleChoiceSolutionAnswerSerializer(data=answer, context=context)
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
             response_data.append(serializer.data)
         headers = self.get_success_headers(response_data)
+
+        Flashcard.update_ranks(multiple_choice_id, "multiplechoice")
+
         return Response(response_data, status=status.HTTP_201_CREATED, headers=headers)
 
     def get_queryset(self):
         return MultipleChoiceSolutionAnswer.objects.filter(
-            user_id=self.kwargs.get("user_id"), solution__multiple_choice__id=self.kwargs.get("multiple_choice_id")
+            solution__multiple_choice__user_id=self.kwargs.get("user_id"),
+            solution__multiple_choice__id=self.kwargs.get("multiple_choice_id")
         ).distinct()

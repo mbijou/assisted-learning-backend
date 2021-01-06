@@ -6,10 +6,10 @@ router = SimpleRouter()
 router.register("multiple-choices", MultipleChoiceViewSet)
 
 answer_urls = [
-    path("users/<int:user_id>/multiple-choices/<int:multiple_choice_id>/answers/",
+    path("multiple-choices/<int:multiple_choice_id>/answers/",
          MultipleChoiceAnswerViewSet.as_view({"get": "list", "post": "create"})),
 
-    path("users/<int:user_id>/multiple-choices/<int:multiple_choice_id>/answers/<int:pk>/",
+    path("multiple-choices/<int:multiple_choice_id>/answers/<int:pk>/",
          MultipleChoiceAnswerViewSet.as_view({"get": "retrieve"})),
 ]
 

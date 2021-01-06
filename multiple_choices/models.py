@@ -19,7 +19,6 @@ class Solution(models.Model):
 class MultipleChoiceSolutionAnswer(models.Model):
     answer = models.BooleanField()
     solution = models.ForeignKey(Solution, blank=False, null=True, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, blank=False, null=True, on_delete=models.CASCADE)
 
 
 post_save.connect(create_flashcard, sender=MultipleChoice)

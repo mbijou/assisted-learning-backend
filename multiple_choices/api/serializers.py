@@ -24,7 +24,7 @@ class MultipleChoiceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MultipleChoice
-        fields = ("id", "question", "workload", "deadline", "solution_set",)
+        fields = ("id", "question", "workload", "deadline", "solution_set", "user", )
 
     @atomic
     def create(self, validated_data):
@@ -42,12 +42,11 @@ class MultipleChoiceUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MultipleChoice
-        fields = ("id", "question", "workload", "deadline", "solution_set", )
+        fields = ("id", "question", "workload", "deadline", "solution_set", "user", )
 
     def validate(self, attrs):
         for solution_dict in attrs.get("solution_set"):
             solution = Solution.objects.get(pk=solution_dict.get("id"))
-            print("ID", solution.multiple_choice.id, self.context.get("pk"))
             if solution.multiple_choice.id != int(self.context.get("pk")):
                 raise ValidationError("Solution must be of the same Multiple Choice")
         return super().validate(attrs)
@@ -71,20 +70,17 @@ class MultipleChoiceUpdateSerializer(serializers.ModelSerializer):
 class MultipleChoiceSolutionAnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = MultipleChoiceSolutionAnswer
-        fields = ("id", "solution", "answer", "user", )
+        fields = ("id", "solution", "answer", )
 
     def validate(self, attrs):
         solution = attrs.get("solution")
-        print("MESSAGE ", solution.multiple_choice, self.context.get("multiple_choice_id"))
         if solution.multiple_choice.id != self.context.get("multiple_choice_id"):
             raise ValidationError("Answers solution must be of the same Multiple Choice")
-        print(attrs)
         return super().validate(attrs)
 
     @atomic
     def create(self, validated_data):
-        user_id = self.context.get("user_id")
-        self.instance = MultipleChoiceSolutionAnswer.objects.create(**validated_data, user_id=user_id)
+        self.instance = MultipleChoiceSolutionAnswer.objects.create(**validated_data)
         return self.instance
 
 
@@ -93,4 +89,4 @@ class MultipleChoiceAnswerSetSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MultipleChoiceSolutionAnswer
-        fields = ("id", "solution", "answer", "user", "multiplechoicesolutionanswer_set", )
+        fields = ("id", "solution", "answer", "multiplechoicesolutionanswer_set", )
