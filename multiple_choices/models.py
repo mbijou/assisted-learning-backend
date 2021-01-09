@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.transaction import atomic
+
 from flashcard.abstract_models import AbstractFlashcard
 from django.db.models.signals import post_save
 from flashcard.models import create_flashcard

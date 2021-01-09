@@ -5,7 +5,7 @@ from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.mixins import RetrieveModelMixin, CreateModelMixin, ListModelMixin
 from flashcard.models import Flashcard
 from multiple_choices.api.serializers import MultipleChoiceSerializer, MultipleChoiceUpdateSerializer, \
-    MultipleChoiceAnswerSetSerializer, MultipleChoiceSolutionAnswerSerializer
+    MultipleChoiceSolutionAnswerSetSerializer, MultipleChoiceSolutionAnswerSerializer
 from multiple_choices.models import MultipleChoice, MultipleChoiceSolutionAnswer
 from rest_framework.response import Response
 
@@ -27,7 +27,7 @@ class MultipleChoiceViewSet(ModelViewSet):
 
 class MultipleChoiceAnswerViewSet(GenericViewSet, CreateModelMixin, RetrieveModelMixin, ListModelMixin):
     queryset = MultipleChoiceSolutionAnswer.objects.all()
-    serializer_class = MultipleChoiceAnswerSetSerializer
+    serializer_class = MultipleChoiceSolutionAnswerSetSerializer
 
     @atomic
     def create(self, request, *args, **kwargs):
@@ -43,6 +43,10 @@ class MultipleChoiceAnswerViewSet(GenericViewSet, CreateModelMixin, RetrieveMode
         headers = self.get_success_headers(response_data)
 
         Flashcard.update_ranks(multiple_choice_id, "multiplechoice")
+
+        multiple_choice = MultipleChoice.objects.get(pk=multiple_choice_id)
+        multiple_choice.workload -= 1
+        multiple_choice.save()
 
         return Response(response_data, status=status.HTTP_201_CREATED, headers=headers)
 

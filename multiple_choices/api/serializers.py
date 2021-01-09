@@ -84,7 +84,7 @@ class MultipleChoiceSolutionAnswerSerializer(serializers.ModelSerializer):
         return self.instance
 
 
-class MultipleChoiceAnswerSetSerializer(serializers.ModelSerializer):
+class MultipleChoiceSolutionAnswerSetSerializer(serializers.ModelSerializer):
     multiplechoicesolutionanswer_set = MultipleChoiceSolutionAnswerSerializer(many=True, write_only=True)
 
     class Meta:

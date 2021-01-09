@@ -113,3 +113,12 @@ class MultipleChoiceAnswerTests(APITestCase):
         response = self.client.post(f"/api/v1/multiple-choices/{self.multiple_choice.id}/answers/",
                                     data, format="json")
         self.assertEqual(response.status_code, 400)
+
+
+    def test_Should_DecreaseWorkloadByOne_When_MultipleChoiceIsAnsweredSuccessfully(self):
+        initial_workload = self.multiple_choice.workload
+        response = self.client.post(f"/api/v1/multiple-choices/{self.multiple_choice.id}/answers/",
+                                    self.data, format="json")
+        self.assertEqual(response.status_code, 201)
+        self.multiple_choice.refresh_from_db()
+        self.assertEqual(self.multiple_choice.workload, initial_workload-1)
