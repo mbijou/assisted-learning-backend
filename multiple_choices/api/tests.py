@@ -112,6 +112,7 @@ class MultipleChoiceAnswerTests(APITestCase):
         }
         response = self.client.post(f"/api/v1/multiple-choices/{self.multiple_choice.id}/answers/",
                                     data, format="json")
+        print(response.json())
         self.assertEqual(response.status_code, 400)
 
 

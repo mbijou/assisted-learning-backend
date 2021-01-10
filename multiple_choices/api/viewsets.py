@@ -34,21 +34,32 @@ class MultipleChoiceAnswerViewSet(GenericViewSet, CreateModelMixin, RetrieveMode
         answer_set = request.data.get("multiplechoicesolutionanswer_set")
         multiple_choice_id = self.kwargs.get("multiple_choice_id")
         response_data = []
+        answer_errors = {"multiplechoicesolutionanswer_set": []}
+        serializer_has_errors = False
         for answer in answer_set:
             context = {"multiple_choice_id": multiple_choice_id}
             serializer = MultipleChoiceSolutionAnswerSerializer(data=answer, context=context)
-            serializer.is_valid(raise_exception=True)
-            self.perform_create(serializer)
-            response_data.append(serializer.data)
-        headers = self.get_success_headers(response_data)
+            if serializer.is_valid():
+                self.perform_create(serializer)
+                response_data.append(serializer.data)
+                answer_errors["multiplechoicesolutionanswer_set"].append({})
+            else:
+                answer_errors["multiplechoicesolutionanswer_set"].append(serializer.errors)
+                serializer_has_errors = True
+        if serializer_has_errors:
+            print("ERRORS ", answer_errors)
+            return Response(answer_errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            headers = self.get_success_headers(response_data)
 
-        Flashcard.update_ranks(multiple_choice_id, "multiplechoice")
+            Flashcard.update_ranks(multiple_choice_id, "multiplechoice")
 
-        multiple_choice = MultipleChoice.objects.get(pk=multiple_choice_id)
-        multiple_choice.workload -= 1
-        multiple_choice.save()
+            multiple_choice = MultipleChoice.objects.get(pk=multiple_choice_id)
+            multiple_choice.workload -= 1
+            multiple_choice.save()
 
-        return Response(response_data, status=status.HTTP_201_CREATED, headers=headers)
+            return Response(response_data, status=status.HTTP_201_CREATED, headers=headers)
+
 
     def get_queryset(self):
         return MultipleChoiceSolutionAnswer.objects.filter(
