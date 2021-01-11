@@ -1,5 +1,7 @@
 from rest_framework.test import APITestCase
 from django.contrib.auth import get_user_model
+
+from flashcard.models import Flashcard
 from single_choices.models import SingleChoice
 User = get_user_model()
 
@@ -19,7 +21,7 @@ class SingleChoiceTests(APITestCase):
         self.assertEqual(SingleChoice.objects.count(), 1)
 
 
-class SingleChoiceUpdateTests(APITestCase):
+class SingleChoiceUpdateAndDeletionTests(APITestCase):
     fixtures = ["single_choices/api/fixtures/single_choices.json", "single_choices/api/fixtures/users.json"]
 
     def setUp(self):
@@ -41,6 +43,15 @@ class SingleChoiceUpdateTests(APITestCase):
         self.assertEqual(self.single_choice.solution, new_solution)
         self.assertEqual(str(self.single_choice.deadline), new_deadline)
         self.assertEqual(self.single_choice.user_id, new_user_id)
+
+    def test_single_choice_can_be_deleted(self):
+        response = self.client.delete(f"/api/v1/single-choices/{self.single_choice.id}/")
+        self.assertEqual(response.status_code, 204)
+
+        self.assertEqual(SingleChoice.objects.filter(pk=self.single_choice.pk).count(), 0)
+        self.assertEqual(Flashcard.objects.filter(
+            object_id=self.single_choice.pk, content_type__model="singlechoice").count(), 0
+                         )
 
 
 class SingleChoiceAnswerTests(APITestCase):

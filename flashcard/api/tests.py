@@ -1,6 +1,10 @@
 from rest_framework.test import APITestCase
 from django.contrib.auth import get_user_model
 from flashcard.models import Flashcard
+from django.contrib.contenttypes.models import ContentType
+
+from multiple_choices.models import MultipleChoice
+from single_choices.models import SingleChoice
 
 User = get_user_model()
 
@@ -59,6 +63,22 @@ class FlashcardTests(APITestCase):
         response1, response2, response3, response4 = self.create_flashcards()
         flashcards = self.get_flashcards(response1, response2, response3, response4)
         return flashcards
+
+    def test_Should_DecrementRanks_When_FlashcardsAreDeleted(self):
+        flashcards = self.create_and_get_flashcards()
+        flashcard_1 = flashcards[0]
+        flashcard_2 = flashcards[1]
+        flashcard_3 = flashcards[2]
+        flashcard_4 = flashcards[3]
+        print(flashcard_2.content_type, flashcard_2.rank, flashcards[2].rank, flashcards[3].rank)
+
+        single_choice_2 = MultipleChoice.objects.get(pk=flashcard_2.object_id)
+        single_choice_2.delete()
+        self.refresh_flashcards([flashcard_1, flashcard_3, flashcard_4])
+        self.assertEqual(flashcard_1.rank, 1)
+        self.assertEqual(flashcard_3.rank, 2)
+        self.assertEqual(flashcard_4.rank, 3)
+
 
     def test_Should_IncrementRanks_When_EachSingleChoiceAndMultipleChoiceCreation(self):
         response1, response2, response3, response4 = self.create_flashcards()

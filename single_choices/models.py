@@ -1,8 +1,8 @@
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.db.transaction import atomic
 from flashcard.abstract_models import AbstractFlashcard
-from flashcard.models import create_flashcard
+from flashcard.models import create_flashcard, delete_flashcard
 
 
 class SingleChoice(AbstractFlashcard):
@@ -23,4 +23,5 @@ class SingleChoiceAnswer(models.Model):
 
 
 post_save.connect(create_flashcard, sender=SingleChoice)
+post_delete.connect(delete_flashcard, sender=SingleChoice)
 

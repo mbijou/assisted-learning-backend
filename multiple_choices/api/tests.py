@@ -1,4 +1,6 @@
 from rest_framework.test import APITestCase
+
+from flashcard.models import Flashcard
 from multiple_choices.models import MultipleChoice, Solution, MultipleChoiceSolutionAnswer
 from django.contrib.auth import get_user_model
 User = get_user_model()
@@ -35,7 +37,7 @@ class MultipleChoiceTests(APITestCase):
         self.assertEqual(response.status_code, 400, "response.status_code should be 400")
 
 
-class MultipleChoiceUpdateTests(APITestCase):
+class MultipleChoiceUpdateAndDeletionTests(APITestCase):
     fixtures = ["multiple_choices/api/fixtures/multiple_choice.json", "multiple_choices/api/fixtures/solutions.json"]
 
     def setUp(self):
@@ -62,6 +64,16 @@ class MultipleChoiceUpdateTests(APITestCase):
         url = f"/api/v1/multiple-choices/3/"
         response = self.client.put(url, self.data, format="json")
         self.assertEqual(response.status_code, 400)
+
+    def test_multiple_choice_can_be_deleted(self):
+        response = self.client.delete(f"/api/v1/multiple-choices/{self.multiple_choice.id}/")
+        self.assertEqual(response.status_code, 204)
+
+        self.assertEqual(MultipleChoice.objects.filter(pk=self.multiple_choice.pk).count(), 0)
+        self.assertEqual(Flashcard.objects.filter(
+            object_id=self.multiple_choice.pk, content_type__model="multiplechoice").count(), 0
+                         )
+
 
 
 class MultipleChoiceAnswerTests(APITestCase):

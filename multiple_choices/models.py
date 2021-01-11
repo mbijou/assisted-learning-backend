@@ -2,8 +2,8 @@ from django.db import models
 from django.db.transaction import atomic
 
 from flashcard.abstract_models import AbstractFlashcard
-from django.db.models.signals import post_save
-from flashcard.models import create_flashcard
+from django.db.models.signals import post_save, post_delete
+from flashcard.models import create_flashcard, delete_flashcard
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
@@ -24,3 +24,4 @@ class MultipleChoiceSolutionAnswer(models.Model):
 
 
 post_save.connect(create_flashcard, sender=MultipleChoice)
+post_delete.connect(delete_flashcard, sender=MultipleChoice)
