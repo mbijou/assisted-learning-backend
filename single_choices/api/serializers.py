@@ -1,8 +1,9 @@
 from rest_framework.serializers import ModelSerializer
-
+from django.utils.timezone import now
 from flashcard.models import Flashcard
 from single_choices.models import SingleChoice, SingleChoiceAnswer
 from django.db.transaction import atomic
+from rest_framework.validators import ValidationError
 
 
 class SingleChoiceSerializer(ModelSerializer):
@@ -24,3 +25,13 @@ class SingleChoiceAnswerSerializer(ModelSerializer):
         Flashcard.update_ranks(single_choice_id, "singlechoice")
 
         return instance
+
+    def validate(self, attrs):
+        single_choice_id = self.context.get("single_choice_id")
+        single_choice = SingleChoice.objects.get(pk=single_choice_id)
+        deadline = single_choice.deadline
+        today = now().date()
+        print(today)
+        if deadline < today:
+            raise ValidationError("Flashcard expired! Please change the deadline in order to solve the task.")
+        return super().validate(attrs)

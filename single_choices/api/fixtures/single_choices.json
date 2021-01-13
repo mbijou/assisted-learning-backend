@@ -5,7 +5,7 @@
     "fields": {
         "question": "Ist die Antwort korrekt?",
         "workload": 5,
-        "deadline": "2021-02-04",
+        "deadline": "2021-01-11",
         "solution": true
     }
 },

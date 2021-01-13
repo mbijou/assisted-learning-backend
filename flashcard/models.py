@@ -3,7 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import F, Max, Q
 from django.db.transaction import atomic
-
+from django.utils.timezone import now
 from flashcard.abstract_models import AbstractFlashcard
 from django.contrib.auth import get_user_model
 User = get_user_model()
@@ -17,6 +17,18 @@ class Flashcard(AbstractFlashcard):
 
     def __str__(self):
         return f"{self.question}"
+
+    @property
+    def status(self):
+        deadline = self.deadline
+        today = now()
+
+        if deadline > today.date() and self.workload == 0:
+            return "DONE"
+        elif deadline > today.date() and self.workload > 0:
+            return "OPEN"
+        else:
+            return "FAILED"
 
     def set_initial_rank(self):
         max_rank_aggregate = Flashcard.objects.filter(user=self.user).aggregate(max_rank=Max("rank"))

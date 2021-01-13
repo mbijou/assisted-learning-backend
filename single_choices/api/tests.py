@@ -1,8 +1,9 @@
 from rest_framework.test import APITestCase
 from django.contrib.auth import get_user_model
-
 from flashcard.models import Flashcard
 from single_choices.models import SingleChoice
+from datetime import datetime
+from unittest import mock
 User = get_user_model()
 
 
@@ -62,7 +63,13 @@ class SingleChoiceAnswerTests(APITestCase):
         self.client.force_authenticate(user=self.user)
         self.single_choice = SingleChoice.objects.get(pk=1)
 
-    def test_single_choice_can_be_answered(self):
+        self.patcher = mock.patch('single_choices.api.serializers.now')
+        self.mock_now = self.patcher.start()
+        self.mock_now.return_value = datetime(2000, 1, 1)
+
+    # @mock.patch('single_choices.api.serializers.now')
+    def test_single_choice_can_be_answered(self):  # , mock_now
+        # mock_now.return_value = datetime(2000, 1, 1)
         response = self.client.post(f"/api/v1/single-choices/{self.single_choice.id}/answers/",
                                     {"answer": True})
         self.assertEqual(response.status_code, 201)
@@ -78,3 +85,6 @@ class SingleChoiceAnswerTests(APITestCase):
         self.assertEqual(response.status_code, 201)
         self.single_choice.refresh_from_db()
         self.assertEqual(self.single_choice.workload, initial_workload-1)
+
+    def tearDown(self):
+        self.patcher.stop()

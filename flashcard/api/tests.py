@@ -1,8 +1,9 @@
+from datetime import datetime
+from unittest import mock
 from rest_framework.test import APITestCase
 from django.contrib.auth import get_user_model
 from flashcard.models import Flashcard
 from django.contrib.contenttypes.models import ContentType
-
 from multiple_choices.models import MultipleChoice
 from single_choices.models import SingleChoice
 
@@ -13,6 +14,14 @@ class FlashcardTests(APITestCase):
     def setUp(self):
         self.user = User.objects.create(username='admin')
         self.client.force_authenticate(user=self.user)
+
+        self.multiple_choice_patcher = mock.patch('multiple_choices.api.viewsets.now')
+        self.multiple_choice_mock_now = self.multiple_choice_patcher.start()
+        self.multiple_choice_mock_now.return_value = datetime(2000, 1, 1)
+
+        self.single_choice_patcher = mock.patch('single_choices.api.serializers.now')
+        self.single_choice_mock_now = self.single_choice_patcher.start()
+        self.single_choice_mock_now.return_value = datetime(2000, 1, 1)
 
         self.single_choice_data_1 = {"question": "Nenn mir alle Primzahlen, wie?", "workload": 42,
                                      "deadline": "2020-03-12", "solution": False, "user": self.user.id}
@@ -177,3 +186,7 @@ class FlashcardTests(APITestCase):
     def refresh_flashcards(self, flashcards):
         for f in flashcards:
             f.refresh_from_db()
+
+    def tearDown(self):
+        self.multiple_choice_patcher.stop()
+        self.single_choice_patcher.stop()

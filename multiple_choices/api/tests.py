@@ -1,5 +1,6 @@
+from unittest import mock
 from rest_framework.test import APITestCase
-
+from datetime import datetime
 from flashcard.models import Flashcard
 from multiple_choices.models import MultipleChoice, Solution, MultipleChoiceSolutionAnswer
 from django.contrib.auth import get_user_model
@@ -85,6 +86,10 @@ class MultipleChoiceAnswerTests(APITestCase):
         self.client.force_authenticate(user=self.user)
         self.multiple_choice = MultipleChoice.objects.get(pk=2)
 
+        self.patcher = mock.patch('multiple_choices.api.viewsets.now')
+        self.mock_now = self.patcher.start()
+        self.mock_now.return_value = datetime(2000, 1, 1)
+
         self.data = {
             "multiplechoicesolutionanswer_set": [
                 {"solution": 1, "answer": False}, {"solution": 2, "answer": False},
@@ -135,3 +140,6 @@ class MultipleChoiceAnswerTests(APITestCase):
         self.assertEqual(response.status_code, 201)
         self.multiple_choice.refresh_from_db()
         self.assertEqual(self.multiple_choice.workload, initial_workload-1)
+
+    def tearDown(self):
+        self.patcher.stop()
