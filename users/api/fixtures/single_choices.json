@@ -1,0 +1,35 @@
+[
+{
+    "model": "single_choices.singlechoice",
+    "pk": 1,
+    "fields": {
+        "question": "Ist die Antwort korrekt?",
+        "workload": 0,
+        "deadline": "2021-01-04",
+        "solution": true,
+        "user": 1
+    }
+},
+{
+    "model": "single_choices.singlechoice",
+    "pk": 2,
+    "fields": {
+        "question": "Bist du sch�n?",
+        "workload": 22,
+        "deadline": "1999-01-11",
+        "solution": true,
+        "user": 1
+    }
+},
+{
+    "model": "single_choices.singlechoice",
+    "pk": 3,
+    "fields": {
+        "question": "Ist die Antwort FALSCH?",
+        "workload": 5,
+        "deadline": "2021-02-04",
+        "solution": true,
+        "user": 1
+    }
+}
+]

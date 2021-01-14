@@ -26,5 +26,6 @@ urlpatterns = [
     path('api/v1/api-token-auth/', CustomAuthToken.as_view()),
     path('api/v1/', include(single_choices_urls)),
     path('api/v1/', include(multiple_choices_urls)),
-    path('api/v1/', include("flashcard.api.urls"))
+    path('api/v1/', include("flashcard.api.urls")),
+    path('api/v1/', include("users.api.urls"))
 ]
