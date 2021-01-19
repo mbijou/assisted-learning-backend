@@ -30,7 +30,7 @@ class AccomplishmentTests(APITestCase):
 
     def setUp(self):
         self.user = User.objects.get(username='admin')
-        self.client.force_login(self.user)
+        self.client.force_authenticate(self.user)
         self.patcher = mock.patch('users.api.viewsets.now')
         self.mock_now = self.patcher.start()
         self.mock_now.return_value = datetime(2000, 1, 1)

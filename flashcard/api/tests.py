@@ -190,3 +190,30 @@ class FlashcardTests(APITestCase):
     def tearDown(self):
         self.multiple_choice_patcher.stop()
         self.single_choice_patcher.stop()
+
+
+class FlashcardStackTests(APITestCase):
+    fixtures = ["flashcard/api/fixtures/single_choices.json", "flashcard/api/fixtures/multiple_choice.json",
+                "flashcard/api/fixtures/solutions.json"]
+
+    def setUp(self):
+        self.user = User.objects.create(username='admin')
+        self.client.force_authenticate(user=self.user)
+
+        self.flashcard_patcher = mock.patch('flashcard.api.viewsets.now')
+        self.flashcard_mock_now = self.flashcard_patcher.start()
+        self.flashcard_mock_now.return_value = datetime(1995, 1, 1)
+
+    def test_Should_ReturnNoResults_When_FlashcardsAreAllDoneOrExpired(self):
+        mc1 = Flashcard.objects.get(object_id=1, content_type__model="multiplechoice")
+        mc2 = Flashcard.objects.get(object_id=2, content_type__model="multiplechoice")
+        sc1 = Flashcard.objects.get(object_id=1, content_type__model="singlechoice")
+        sc2 = Flashcard.objects.get(object_id=2, content_type__model="singlechoice")
+
+        response = self.client.get(f"/api/v1/users/{self.user.id}/flashcards/rank-one-flashcards/")
+        self.assertEqual(response.status_code, 200)
+        print(response.json())
+        self.assertEqual(len(response.json()), 0)
+
+    def tearDown(self):
+        self.flashcard_patcher.stop()
