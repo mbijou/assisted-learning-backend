@@ -49,7 +49,9 @@ class UserViewSet(ReadOnlyModelViewSet):
         amount_flashcards_open = Count(
             'flashcard__id', filter=Q(flashcard__workload__gt=0, flashcard__deadline__gt=now().date())
         )
-        amount_flashcards_expired = Count('flashcard__id', filter=Q(flashcard__deadline__lt=now().date()))
+        amount_flashcards_expired = Count(
+            'flashcard__id', filter=Q(flashcard__deadline__lt=now().date(), flashcard__workload__gt=0)
+        )
 
         percentage_flashcards_total = Count('flashcard__id')
         percentage_flashcards_done = Cast(

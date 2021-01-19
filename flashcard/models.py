@@ -23,7 +23,7 @@ class Flashcard(AbstractFlashcard):
         deadline = self.deadline
         today = now()
 
-        if deadline > today.date() and self.workload == 0:
+        if self.workload == 0:
             return "DONE"
         elif deadline > today.date() and self.workload > 0:
             return "OPEN"

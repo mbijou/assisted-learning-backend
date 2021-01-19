@@ -1,4 +1,4 @@
-from django.db.models import F, Case, When, CharField, Value
+from django.db.models import F, Case, When, CharField, Value, Min, IntegerField
 from rest_framework.decorators import action
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from flashcard.api.serializers import FlashcardSerializer
@@ -20,14 +20,18 @@ class FlashcardViewSet(ReadOnlyModelViewSet):
     @action(detail=False, url_path="rank-one-flashcards")
     def rank_one_flashcards(self, request, user_id=None):
         today = now().date()
-        rank_one_flashcards = Flashcard.objects.filter(rank=1).annotate(
+
+        queryset = Flashcard.objects.annotate(
             status=Case(
-                When(deadline__gt=today, workload=0, then=Value("DONE")),
-                When(deadline__gt=today, workload__gt=0, then=Value("OPEN")),
-                default=Value("FAILED"),
+                When(workload=0, then=Value('DONE')),
+                When(deadline__gt=today, workload__gt=0, then=Value('OPEN')),
+                default=Value('FAILED'),
                 output_field=CharField(),
             )
-        ).filter(status="OPEN")[:1]
+        ).filter(status="OPEN")
+
+        lowest_rank = queryset.aggregate(lowest_rank=Min("rank")).get("lowest_rank")
+        rank_one_flashcards = Flashcard.objects.filter(rank=lowest_rank, user_id=user_id)[:1]
 
         serializer = self.get_serializer(rank_one_flashcards, many=True)
         return Response(serializer.data)
