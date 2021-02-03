@@ -1,9 +1,10 @@
 from django.db.models import Count, Q, Sum, F, FloatField
 from django.db.models.functions import Cast
-from rest_framework.generics import get_object_or_404
+from rest_framework.generics import get_object_or_404, CreateAPIView
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import ReadOnlyModelViewSet
-from users.api.serializers import UserSerializer, UserAccomplishmentSerializer
+from users.api.serializers import UserSerializer, UserAccomplishmentSerializer, RegistrationSerializer
 from django.contrib.auth import get_user_model
 from rest_framework.decorators import action
 # User = get_user_model()
@@ -82,3 +83,9 @@ class UserViewSet(ReadOnlyModelViewSet):
         ).distinct()
 
         return self.queryset
+
+
+class RegistrationView(CreateAPIView):
+    serializer_class = RegistrationSerializer
+    queryset = User.objects.all()
+    permission_classes = (AllowAny,)

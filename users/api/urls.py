@@ -1,5 +1,5 @@
 from rest_framework.routers import SimpleRouter
-from users.api.viewsets import UserViewSet
+from users.api.viewsets import UserViewSet, RegistrationView
 from django.urls import path
 
 
@@ -16,6 +16,7 @@ user_urls = [
 
     path("users/<int:pk>/",
          UserViewSet.as_view({"get": "retrieve"})),
+    path('users/registration/', RegistrationView.as_view()),
 ]
 
 urlpatterns = user_urls
