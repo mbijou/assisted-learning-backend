@@ -77,7 +77,6 @@ class SingleChoiceAnswerTests(APITestCase):
         answer_set = self.single_choice.singlechoiceanswer_set.all()
         self.assertIn(answer_id, answer_set.values_list("id", flat=True))
 
-
     def test_Should_DecreaseWorkloadByOne_When_SingleChoiceIsAnsweredSuccessfully(self):
         initial_workload = self.single_choice.workload
         response = self.client.post(f"/api/v1/single-choices/{self.single_choice.id}/answers/",

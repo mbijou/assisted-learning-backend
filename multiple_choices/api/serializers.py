@@ -2,6 +2,7 @@ from rest_framework import serializers
 from multiple_choices.models import MultipleChoice, Solution, MultipleChoiceSolutionAnswer
 from django.db.transaction import atomic
 from rest_framework.exceptions import ValidationError
+from django.shortcuts import get_object_or_404
 
 
 class SolutionSerializer(serializers.ModelSerializer):
@@ -55,7 +56,8 @@ class MultipleChoiceUpdateSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         solution_set = validated_data.pop("solution_set")
 
-        instance = MultipleChoice(pk=instance.pk, **validated_data)
+        instance = get_object_or_404(MultipleChoice, pk=instance.pk)
+        instance.__dict__.update(validated_data)
         instance.save()
 
         for solution in solution_set:

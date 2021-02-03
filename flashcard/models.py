@@ -18,18 +18,6 @@ class Flashcard(AbstractFlashcard):
     def __str__(self):
         return f"{self.question}"
 
-    @property
-    def status(self):
-        deadline = self.deadline
-        today = now()
-
-        if self.workload == 0:
-            return "DONE"
-        elif deadline > today.date() and self.workload > 0:
-            return "OPEN"
-        else:
-            return "FAILED"
-
     def set_initial_rank(self):
         max_rank_aggregate = Flashcard.objects.filter(user=self.user).aggregate(max_rank=Max("rank"))
         if max_rank_aggregate.get("max_rank") is None or max_rank_aggregate.get("max_rank") <= 0:

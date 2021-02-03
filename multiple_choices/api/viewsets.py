@@ -100,6 +100,11 @@ class MultipleChoiceAnswerViewSet(GenericViewSet, CreateModelMixin, RetrieveMode
                 "non_field_errors": ["Flashcard expired! Please change the deadline in order to solve the task."]
             }
             return False, error_message
+        elif multiple_choice.status == "DONE":
+            error_message = {
+                "non_field_errors": ["Flashcard DONE! Please set a new workload in order to solve the task again."]
+            }
+            return False, error_message
         return True, None
 
     def get_queryset(self):

@@ -31,7 +31,8 @@ class SingleChoiceAnswerSerializer(ModelSerializer):
         single_choice = SingleChoice.objects.get(pk=single_choice_id)
         deadline = single_choice.deadline
         today = now().date()
-        print(today)
         if deadline < today:
             raise ValidationError("Flashcard expired! Please change the deadline in order to solve the task.")
+        elif single_choice.status == "DONE":
+            raise ValidationError("Flashcard DONE! Please set a new workload in order to solve the task again.")
         return super().validate(attrs)
